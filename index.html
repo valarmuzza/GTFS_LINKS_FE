@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <title>Lista Link</title>
+</head>
+<body>
+  <h1>Lista Link da MongoDB (FastAPI)</h1>
+  <table border="1" id="tabella">
+    <thead>
+      <tr><th>Nome</th><th>Link</th></tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <script>
+    async function caricaDati() {
+      const res = await fetch("https://gtfs-links-be.onrender.com/links"); 
+      const dati = await res.json();
+      const tbody = document.querySelector("#tabella tbody");
+      dati.forEach(riga => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `<td>${riga.nome}</td><td><a href="${riga.link}" target="_blank">${riga.link}</a></td>`;
+        tbody.appendChild(tr);
+      });
+    }
+    caricaDati();
+  </script>
+</body>
+</html>
