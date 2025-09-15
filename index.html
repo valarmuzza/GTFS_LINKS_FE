@@ -20,7 +20,7 @@
       const tbody = document.querySelector("#tabella tbody");
       dati.forEach(riga => {
         const tr = document.createElement("tr");
-        tr.innerHTML = `<td>${riga.OPERATORE}</td><td><a href="${riga.SOURCE}" target="_blank">${riga.SOURCE}</a></td>`;
+        tr.innerHTML = `<td>${riga.OPERATORE}</td><td>${riga.REGIONE}</td><td>${riga.COMUNE}</td><td>${riga.NOTE}</td><td><a href="${riga.SOURCE}" target="_blank">${riga.SOURCE}</a></td>`;
         tbody.appendChild(tr);
       });
     }
