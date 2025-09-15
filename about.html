@@ -6,6 +6,7 @@
   <link
     href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
     rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
     <style>
   /* link normali */
   .custom-nav .nav-link {
@@ -41,10 +42,10 @@
     <div class="container">
       <ul class="nav nav-underline nav-fill w-100 custom-nav">
         <li class="nav-item">
-          <a class="nav-link active" href="index.html">Home</a>
+          <a class="nav-link" href="index.html">Home</a>
         </li>
         <!-- <li class="nav-item">
-          <a class="nav-link" href="about.html">Cos’è un GTFS</a>
+          <a class="nav-link" href="cosagtfs.html">Cos’è un GTFS</a>
         </li> -->
         <li class="nav-item">
           <a class="nav-link" href="submit.html">Segnala un GTFS</a>
@@ -57,42 +58,25 @@
   </nav>
 
   <!-- Contenuto principale -->
-  <div class="container mt-4">
-    <h1 class="mb-4">Elenco GTFS Italia</h1>
-    <table class="table table-striped" id="tabella">
-      <thead>
-        <tr>
-          <th>Nome</th>
-          <th>Regione</th>
-          <th>Comune</th>
-          <th>Note</th>
-          <th>GTFS</th>
-        </tr>
-      </thead>
-      <tbody></tbody>
-    </table>
-  </div>
-
+<div class="container mt-4">
+  <div class="card shadow-sm">
+    <div class="card-body">
+      <h3 class="card-title">Chi sono</h3>
+      <p class="card-text">
+        Ciao! Sono Valerio e lavoro come Data Scientist in RFI. Visto che spesso mi ritrovo a ricercare GTFS e i loro aggiornamenti sui siti dei vari enti pubblici, ho deciso di creare questo repository per raccogliere tutti i link in un unico posto.
+      </p>
+      <p class="card-text">
+        Ho provato a cercare se fosse disponibile un qualcosa di questo tipo a livello istituzionale, ma non ho trovato nulla :/
+      </p>
+      <p class="card-text">
+        In caso volessi contattarmi per segnalare qualche GTFS non presente nel repository o qualche errore, puoi scrivermi su 
+        <a href="https://www.linkedin.com/in/valerio-armuzza" target="_blank" class="linkedin-link">
+          <i class="bi bi-linkedin"></i> LinkedIn
+        </a> 
+        oppure utilizzare il <a href="submit.html">form</a>.
+      </p>
+    </div>
   <script>
-    async function caricaDati() {
-      const res = await fetch("https://gtfs-links-be.onrender.com/links"); 
-      const dati = await res.json();
-      // Ordinamento alfabetico per OPERATORE
-      dati.sort((a, b) => a.OPERATORE.localeCompare(b.OPERATORE, 'it'));
-      const tbody = document.querySelector("#tabella tbody");
-      dati.forEach(riga => {
-        const tr = document.createElement("tr");
-        tr.innerHTML = `
-          <td>${riga.OPERATORE}</td>
-          <td>${riga.REGIONE}</td>
-          <td>${riga.COMUNE}</td>
-          <td>${riga.NOTE}</td>
-          <td><a href="${riga.SOURCE}" target="_blank"  class="btn btn-sm btn-primary">Download</a></td>
-        `;
-        tbody.appendChild(tr);
-      });
-    }
-    caricaDati();
     const links = document.querySelectorAll(".custom-nav .nav-link");
       links.forEach(link => {
         if(link.href === window.location.href) {
@@ -102,5 +86,6 @@
         }
     });
   </script>
+
 </body>
 </html>
