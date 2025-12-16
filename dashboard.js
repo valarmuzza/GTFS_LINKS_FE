@@ -111,3 +111,12 @@ async function loadStats() {
 
 // Avvio iniziale
 loadData();
+
+const links = document.querySelectorAll(".custom-nav .nav-link");
+    links.forEach(link => {
+    if(link.href === window.location.href) {
+        link.classList.add("active");
+    } else {
+        link.classList.remove("active");
+    }
+});
