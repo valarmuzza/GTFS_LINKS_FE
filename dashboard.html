@@ -21,9 +21,55 @@
     body, html { height: 100%; margin: 0; }
     #mapDiv { width: 100%; height: 100%; }
     #statsPanel { height: 100%; }
+  /* link normali */
+  .custom-nav .nav-link {
+    color: #004080; /* blu scuro */
+    font-weight: 400;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s ease-in-out;
+  }
+
+  /* hover */
+  .custom-nav .nav-link:hover {
+    border-bottom: 2px solid #004080;
+    font-weight: 500;
+  }
+
+  /* pagina attiva */
+  .custom-nav .nav-link.active {
+    border-bottom: 2px solid #004080;
+    font-weight: 700;
+  }
   </style>
 </head>
 <body>
+  <!-- Header principale (scuro) -->
+  <nav class="navbar navbar-expand-lg" style="background-color:#0066cc;">
+    <div class="container">
+      <span class="navbar-brand text-white">GTFS Dashboard</span>
+    </div>
+  </nav>
+
+  <!-- Secondo header (chiaro, con link) -->
+  <nav class="navbar navbar-expand-lg" style="background-color:#e6f0ff;">
+    <div class="container">
+      <ul class="nav nav-underline nav-fill w-100 custom-nav">
+        <li class="nav-item">
+          <a class="nav-link active" href="index.html">Home</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="dashboard.html">Una mappa dei GTFS</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="submit.html">Segnala un GTFS</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="about.html">Contatti</a>
+        </li>
+      </ul>
+    </div>
+  </nav>
+  
   <div class="container-fluid vh-100">
     <div class="row h-100">
       <div class="col-md-8 p-0">
