@@ -14,14 +14,13 @@ function getCenter(geojson) {
   return [lon, lat];
 }
 
-// Carica heatmap
+// Carica punti sulla mappa con cluster e numeri
 function loadMap(geojson) {
   require([
     "esri/Map",
     "esri/views/MapView",
-    "esri/layers/FeatureLayer",
-    "esri/renderers/HeatmapRenderer"
-  ], function(Map, MapView, FeatureLayer, HeatmapRenderer) {
+    "esri/layers/FeatureLayer"
+  ], function(Map, MapView, FeatureLayer) {
 
     const map = new Map({ basemap: "gray-vector" });
 
@@ -36,7 +35,6 @@ function loadMap(geojson) {
 
     if (layer) map.remove(layer);
 
-    // Layer heatmap
     layer = new FeatureLayer({
       source: geojson.features.map((f, i) => ({
         geometry: {
@@ -44,28 +42,49 @@ function loadMap(geojson) {
           longitude: f.geometry.coordinates[0],
           latitude: f.geometry.coordinates[1]
         },
-        attributes: { ObjectID: i }
+        attributes: {
+          ObjectID: i,
+          name: f.properties.name,
+          count: f.properties.count,
+          level: f.properties.level
+        }
       })),
       objectIdField: "ObjectID",
       geometryType: "point",
-      renderer: new HeatmapRenderer({
-        field: "ObjectID",
-        colorStops: [
-          { ratio: 0, color: "rgba(0,0,255,0)" },
-          { ratio: 0.2, color: "blue" },
-          { ratio: 0.4, color: "cyan" },
-          { ratio: 0.6, color: "lime" },
-          { ratio: 0.8, color: "yellow" },
-          { ratio: 1, color: "red" }
-        ],
-        blurRadius: 20,
-        maxPixelIntensity: 50
-      })
+      fields: [
+        { name: "ObjectID", type: "oid" },
+        { name: "name", type: "string" },
+        { name: "count", type: "integer" },
+        { name: "level", type: "string" }
+      ],
+      popupTemplate: {
+        title: "{name}",
+        content: "GTFS disponibili: <b>{count}</b>"
+      },
+      labelingInfo: [{
+        labelExpressionInfo: { expression: "Text($feature.count, '#')" },
+        symbol: {
+          type: "text",
+          color: "white",
+          haloColor: "black",
+          haloSize: "1px",
+          font: { size: 12, weight: "bold" }
+        },
+        labelPlacement: "above-center"
+      }],
+      featureReduction: {
+        type: "cluster",
+        clusterRadius: "60px",
+        popupTemplate: {
+          title: "Cluster",
+          content: "GTFS totali: {cluster_count}"
+        }
+      }
     });
 
     map.add(layer);
 
-    // Centra e zoom
+    // Zoom e centro automatico
     const [centerLon, centerLat] = getCenter(geojson);
     let zoomLevel = 6;
     if (livello === "regionale") zoomLevel = 9;
@@ -75,7 +94,7 @@ function loadMap(geojson) {
   });
 }
 
-// Carica statistiche mezzi
+// Carica grafico a barre con tipologia di mezzi
 async function loadStats() {
   let url = `${API_BASE}/stats/mezzi?livello=${livello}`;
   if (valore) url += `&valore=${encodeURIComponent(valore)}`;
@@ -83,7 +102,11 @@ async function loadStats() {
   const res = await fetch(url);
   const data = await res.json();
 
-  const ctx = document.getElementById("mezziBarChart");
+  const canvas = document.getElementById("mezziBarChart");
+  if (!canvas) return console.error("Canvas non trovato");
+
+  const ctx = canvas.getContext("2d");
+
   if (chart) chart.destroy();
 
   chart = new Chart(ctx, {
@@ -120,6 +143,7 @@ async function loadData() {
   const geojson = await res.json();
 
   document.getElementById("title").innerText = valore || "Italia";
+
   loadMap(geojson);
   loadStats();
 }
