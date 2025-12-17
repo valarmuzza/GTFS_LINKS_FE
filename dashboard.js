@@ -1,20 +1,21 @@
 const API_BASE = "https://gtfs-links-be.onrender.com";
 
-let livello = "nazionale";
-let valore = null;
+let livello = "nazionale"; // nazionale, regionale, comunale
+let valore = null;          // nome della regione/comune selezionata
 let view, layer, chart;
 
-// Calcolo centro GeoJSON
+// Calcola centro dei punti GeoJSON
 function getCenter(geojson) {
-  if (!geojson || !geojson.features.length) return [12, 43];
+  if (!geojson || !geojson.features.length) return [12, 43]; // fallback Italia
   const lons = geojson.features.map(f => f.geometry.coordinates[0]);
   const lats = geojson.features.map(f => f.geometry.coordinates[1]);
-  const lon = (Math.min(...lons) + Math.max(...lons)) / 2;
-  const lat = (Math.min(...lats) + Math.max(...lats)) / 2;
-  return [lon, lat];
+  return [
+    (Math.min(...lons) + Math.max(...lons)) / 2,
+    (Math.min(...lats) + Math.max(...lats)) / 2
+  ];
 }
 
-// Carica punti sulla mappa con cluster e numeri
+// Carica la mappa con punti e cluster
 function loadMap(geojson) {
   require([
     "esri/Map",
@@ -35,6 +36,7 @@ function loadMap(geojson) {
 
     if (layer) map.remove(layer);
 
+    // Layer punti
     layer = new FeatureLayer({
       source: geojson.features.map((f, i) => ({
         geometry: {
@@ -84,17 +86,32 @@ function loadMap(geojson) {
 
     map.add(layer);
 
-    // Zoom e centro automatico
+    // Zoom automatico
     const [centerLon, centerLat] = getCenter(geojson);
     let zoomLevel = 6;
     if (livello === "regionale") zoomLevel = 9;
     else if (livello === "comunale") zoomLevel = 13;
 
     view.goTo({ center: [centerLon, centerLat], zoom: zoomLevel });
+
+    // Click sui punti per drill-down
+    view.on("click", async (event) => {
+      const hit = await view.hitTest(event);
+      const g = hit.results?.find(r => r.graphic && r.graphic.attributes.level)?.graphic;
+      if (!g) return;
+
+      // Aggiorna livello e valore
+      livello = g.attributes.level;
+      valore = g.attributes.name;
+      document.getElementById("title").innerText = valore;
+
+      // Ricarica dati filtrati
+      loadData();
+    });
   });
 }
 
-// Carica grafico a barre con tipologia di mezzi
+// Carica grafico a barre per tipologia di mezzi
 async function loadStats() {
   let url = `${API_BASE}/stats/mezzi?livello=${livello}`;
   if (valore) url += `&valore=${encodeURIComponent(valore)}`;
@@ -131,7 +148,7 @@ async function loadStats() {
   });
 }
 
-// Fetch dati GeoJSON e stats
+// Fetch dati GeoJSON e stats in base a livello/valore
 async function loadData() {
   let url = `${API_BASE}/map/${livello}`;
   if (valore) {
@@ -150,7 +167,6 @@ async function loadData() {
 
 // Avvio iniziale
 loadData();
-
 const links = document.querySelectorAll(".custom-nav .nav-link");
     links.forEach(link => {
     if(link.href === window.location.href) {
